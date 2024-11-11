@@ -29,6 +29,43 @@ impl<T: WasmPrimitive> WasmAbi for T {
     }
 }
 
+impl WasmAbi for i128 {
+    type Prim1 = u64;
+    type Prim2 = u64;
+    type Prim3 = ();
+    type Prim4 = ();
+
+    #[inline]
+    fn split(self) -> (u64, u64, (), ()) {
+        let low = self as u64;
+        let high = (self >> 64) as u64;
+        (low, high, (), ())
+    }
+
+    #[inline]
+    fn join(low: u64, high: u64, _: (), _: ()) -> Self {
+        ((high as u128) << 64 | low as u128) as i128
+    }
+}
+impl WasmAbi for u128 {
+    type Prim1 = u64;
+    type Prim2 = u64;
+    type Prim3 = ();
+    type Prim4 = ();
+
+    #[inline]
+    fn split(self) -> (u64, u64, (), ()) {
+        let low = self as u64;
+        let high = (self >> 64) as u64;
+        (low, high, (), ())
+    }
+
+    #[inline]
+    fn join(low: u64, high: u64, _: (), _: ()) -> Self {
+        (high as u128) << 64 | low as u128
+    }
+}
+
 impl<T: WasmAbi<Prim4 = ()>> WasmAbi for Option<T> {
     /// Whether this `Option` is a `Some` value.
     type Prim1 = u32;
@@ -99,14 +136,68 @@ macro_rules! type_wasm_native {
 }
 
 type_wasm_native!(
+    i64 as i64
+    u64 as u64
+    i128 as i128
+    u128 as u128
+    f64 as f64
+);
+
+/// The sentinel value is 2^32 + 1 for 32-bit primitive types.
+///
+/// 2^32 + 1 is used, because it's the smallest positive integer that cannot be
+/// represented by any 32-bit primitive. While any value >= 2^32 works as a
+/// sentinel value for 32-bit integers, it's a bit more tricky for `f32`. `f32`
+/// can represent all powers of 2 up to 2^127 exactly. And between 2^32 and 2^33,
+/// `f32` can represent all integers 2^32+512*k exactly.
+const F64_ABI_OPTION_SENTINEL: f64 = 4294967297_f64;
+
+macro_rules! type_wasm_native_f64_option {
+    ($($t:tt as $c:tt)*) => ($(
+        impl IntoWasmAbi for $t {
+            type Abi = $c;
+
+            #[inline]
+            fn into_abi(self) -> $c { self as $c }
+        }
+
+        impl FromWasmAbi for $t {
+            type Abi = $c;
+
+            #[inline]
+            unsafe fn from_abi(js: $c) -> Self { js as $t }
+        }
+
+        impl IntoWasmAbi for Option<$t> {
+            type Abi = f64;
+
+            #[inline]
+            fn into_abi(self) -> Self::Abi {
+                self.map(|v| v as $c as f64).unwrap_or(F64_ABI_OPTION_SENTINEL)
+            }
+        }
+
+        impl FromWasmAbi for Option<$t> {
+            type Abi = f64;
+
+            #[inline]
+            unsafe fn from_abi(js: Self::Abi) -> Self {
+                if js == F64_ABI_OPTION_SENTINEL {
+                    None
+                } else {
+                    Some(js as $c as $t)
+                }
+            }
+        }
+    )*)
+}
+
+type_wasm_native_f64_option!(
     i32 as i32
     isize as i32
     u32 as u32
     usize as u32
-    i64 as i64
-    u64 as u64
     f32 as f32
-    f64 as f64
 );
 
 macro_rules! type_abi_as_u32 {
