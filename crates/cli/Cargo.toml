@@ -33,8 +33,7 @@ serde_json = "1.0"
 ureq = { version = "2.7", default-features = false, features = ["brotli", "gzip"] }
 walrus = { version = "0.22", features = ['parallel'] }
 wasm-bindgen-cli-support = { path = "../cli-support", version = "=0.2.95" }
-wasm-bindgen-shared = { path = "../shared", version = "=0.2.95" }
-
+wasm-bindgen-shared = "0.2.95"
 [dev-dependencies]
 assert_cmd = "2"
 diff = "0.1"
