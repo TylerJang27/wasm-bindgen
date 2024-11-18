@@ -1,69 +1,43 @@
 #![cfg(target_arch = "wasm32")]
-#![allow(renamed_and_removed_lints)] // clippy::drop_ref will be renamed to drop_ref
-#![allow(clippy::drop_ref, clippy::drop_non_drop)]
+#![allow(non_snake_case)]
 
-extern crate js_sys;
-extern crate wasm_bindgen;
-extern crate wasm_bindgen_test;
-extern crate wasm_bindgen_test_crate_a;
-extern crate wasm_bindgen_test_crate_b;
-
-#[cfg(feature = "serde-serialize")]
-#[macro_use]
-extern crate serde_derive;
-
-use wasm_bindgen::prelude::*;
-
-#[path = "3944.rs"]
-pub mod _3944;
-pub mod api;
-pub mod arg_names;
-pub mod async_vecs;
-pub mod bigint;
-pub mod char;
-pub mod classes;
-pub mod closures;
-pub mod comments;
-pub mod duplicate_deps;
-pub mod duplicates;
-pub mod enum_vecs;
-pub mod enums;
-#[path = "final.rs"]
-pub mod final_;
-pub mod futures;
-pub mod gc;
-pub mod getters_and_setters;
-pub mod ignore;
-pub mod import_class;
-pub mod imports;
-pub mod inner_self;
-pub mod intrinsics;
-pub mod js_keywords;
-pub mod js_objects;
-pub mod jscast;
-pub mod link_to;
-pub mod macro_rules;
-pub mod math;
-pub mod no_shims;
-pub mod node;
-pub mod option;
-pub mod optional_primitives;
-pub mod result;
-pub mod result_jserror;
-pub mod rethrow;
-pub mod simple;
-pub mod slice;
-pub mod string_vecs;
-pub mod struct_vecs;
-pub mod structural;
-pub mod truthy_falsy;
-pub mod usize;
-pub mod validate_prt;
-pub mod variadic;
-pub mod vendor_prefix;
-
-// should not be executed
-#[wasm_bindgen(start)]
-fn start() {
-    panic!();
-}
+pub mod Array;
+pub mod ArrayBuffer;
+pub mod ArrayIterator;
+pub mod BigInt;
+pub mod Boolean;
+pub mod DataView;
+pub mod Date;
+pub mod Error;
+pub mod EvalError;
+pub mod Function;
+pub mod Generator;
+pub mod Intl;
+pub mod Iterator;
+pub mod JSON;
+pub mod JsString;
+pub mod Map;
+pub mod MapIterator;
+pub mod Math;
+pub mod Number;
+pub mod Object;
+pub mod Promise;
+pub mod Proxy;
+pub mod RangeError;
+pub mod ReferenceError;
+pub mod Reflect;
+pub mod RegExp;
+pub mod Set;
+pub mod SetIterator;
+pub mod SharedArrayBuffer;
+pub mod Symbol;
+pub mod SyntaxError;
+#[cfg(js_sys_unstable_apis)]
+pub mod Temporal;
+pub mod TypeError;
+pub mod TypedArray;
+pub mod UriError;
+pub mod WeakMap;
+pub mod WeakSet;
+pub mod WebAssembly;
+pub mod global_fns;
